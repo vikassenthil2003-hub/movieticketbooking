@@ -47,20 +47,44 @@ const LoginPage = () => {
   };
 
   // In development mode only, provide non-privileged demo login helpers
-  const isDev = import.meta.env.DEV;
+  const isDev =
+    process.env.NODE_ENV !== 'production' ||
+    (typeof import.meta !== 'undefined' && import.meta.env?.DEV);
 
   const demoAccounts = {
     user: {
-      email: import.meta.env.VITE_DEMO_CUSTOMER_EMAIL || 'customer@cineverse.com',
+      email:
+        process.env.REACT_APP_DEMO_CUSTOMER_EMAIL ||
+        process.env.VITE_DEMO_CUSTOMER_EMAIL ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_CUSTOMER_EMAIL) ||
+        'customer@cineverse.com',
       password: isDev ? 'Customer@CineVerse2026' : '',
     },
     admin: {
-      email: import.meta.env.VITE_DEMO_ADMIN_EMAIL || 'admin@cineverse.com',
-      password: isDev ? (import.meta.env.VITE_DEMO_ADMIN_PASSWORD || 'Admin@CineVerse2026') : '',
+      email:
+        process.env.REACT_APP_DEMO_ADMIN_EMAIL ||
+        process.env.VITE_DEMO_ADMIN_EMAIL ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_ADMIN_EMAIL) ||
+        'admin@cineverse.com',
+      password: isDev
+        ? process.env.REACT_APP_DEMO_ADMIN_PASSWORD ||
+          process.env.VITE_DEMO_ADMIN_PASSWORD ||
+          (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_ADMIN_PASSWORD) ||
+          'Admin@CineVerse2026'
+        : '',
     },
     theatre: {
-      email: import.meta.env.VITE_DEMO_THEATRE_EMAIL || 'theatre@cineverse.com',
-      password: isDev ? (import.meta.env.VITE_DEMO_THEATRE_PASSWORD || 'Theatre@CineVerse2026') : '',
+      email:
+        process.env.REACT_APP_DEMO_THEATRE_EMAIL ||
+        process.env.VITE_DEMO_THEATRE_EMAIL ||
+        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_THEATRE_EMAIL) ||
+        'theatre@cineverse.com',
+      password: isDev
+        ? process.env.REACT_APP_DEMO_THEATRE_PASSWORD ||
+          process.env.VITE_DEMO_THEATRE_PASSWORD ||
+          (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_THEATRE_PASSWORD) ||
+          'Theatre@CineVerse2026'
+        : '',
     },
   };
 

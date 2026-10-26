@@ -4,7 +4,12 @@ import { io } from 'socket.io-client';
 // In local dev, connecting directly to http://localhost:5000 avoids Vite proxy HTTP-polling disconnect issues.
 // Can also be overridden with VITE_SOCKET_URL environment variable.
 const getSocketUrl = () => {
-  const envSocketUrl = (import.meta.env.VITE_SOCKET_URL || '').trim();
+  const envSocketUrl = (
+    process.env.REACT_APP_SOCKET_URL ||
+    process.env.VITE_SOCKET_URL ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SOCKET_URL : '') ||
+    ''
+  ).trim();
   const isSocketPlaceholder =
     !envSocketUrl ||
     envSocketUrl.includes('your-backend-deployment-url') ||
@@ -14,7 +19,12 @@ const getSocketUrl = () => {
     return envSocketUrl;
   }
 
-  const envApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+  const envApiUrl = (
+    process.env.REACT_APP_API_URL ||
+    process.env.VITE_API_URL ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_URL : '') ||
+    ''
+  ).trim();
   const isApiPlaceholder =
     !envApiUrl ||
     envApiUrl.includes('your-backend-deployment-url') ||

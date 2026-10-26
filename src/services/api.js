@@ -5,7 +5,12 @@ import axios from 'axios';
 // - Uses http://localhost:5000 as the local development fallback
 // - Avoids duplicate /api prefixes and provides helpful production diagnostics
 const resolveApiBaseUrl = () => {
-  const envUrl = (import.meta.env.VITE_API_URL || '').trim();
+  const envUrl = (
+    process.env.REACT_APP_API_URL ||
+    process.env.VITE_API_URL ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_URL : '') ||
+    ''
+  ).trim();
 
   const isPlaceholder =
     !envUrl ||
