@@ -4,54 +4,41 @@ import { io } from 'socket.io-client';
 // In local dev, connecting directly to http://localhost:5000 avoids Vite proxy HTTP-polling disconnect issues.
 // Can also be overridden with VITE_SOCKET_URL environment variable.
 const getSocketUrl = () => {
-  const envSocketUrl = (
+  const isLocalhost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  if (isLocalhost) {
+    return 'http://localhost:5000';
+  }
+
+  let envSocketUrl = (
     process.env.REACT_APP_SOCKET_URL ||
     process.env.VITE_SOCKET_URL ||
-    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SOCKET_URL : '') ||
-    ''
-  ).trim();
-  const isSocketPlaceholder =
-    !envSocketUrl ||
-    envSocketUrl.includes('your-backend-deployment-url') ||
-    envSocketUrl.includes('placeholder');
-
-  if (!isSocketPlaceholder) {
-    return envSocketUrl;
-  }
-
-  const envApiUrl = (
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
-    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_URL : '') ||
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL : '') ||
     ''
   ).trim();
-  const isApiPlaceholder =
-    !envApiUrl ||
-    envApiUrl.includes('your-backend-deployment-url') ||
-    envApiUrl.includes('your-backend.onrender.com') ||
-    envApiUrl.includes('<');
 
-  if (!isApiPlaceholder) {
-    try {
-      const parsed = new URL(envApiUrl);
-      return parsed.origin;
-    } catch {
-      // fallback
-    }
+  if (
+    !envSocketUrl ||
+    envSocketUrl.includes('localhost') ||
+    envSocketUrl.includes('127.0.0.1') ||
+    envSocketUrl.includes('your-backend-deployment-url') ||
+    envSocketUrl.includes('your-backend.onrender.com') ||
+    envSocketUrl.includes('<') ||
+    envSocketUrl === 'placeholder'
+  ) {
+    envSocketUrl = 'https://ticketformovie.onrender.com';
   }
 
-  if (typeof window !== 'undefined') {
-    const isLocalhost =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1';
-    if (isLocalhost) {
-      return `${window.location.protocol}//${window.location.hostname}:5000`;
-    }
-    // In production without configured VITE_SOCKET_URL / VITE_API_URL, do NOT connect to Vercel origin.
-    // Return null to avoid spamming Vercel's static router with WebSocket polling requests.
-    return null;
+  try {
+    const parsed = new URL(envSocketUrl);
+    return parsed.origin;
+  } catch {
+    return 'https://ticketformovie.onrender.com';
   }
-  return 'http://localhost:5000';
 };
 
 const socketUrl = getSocketUrl();

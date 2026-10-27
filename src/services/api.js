@@ -5,33 +5,34 @@ import axios from 'axios';
 // - Uses http://localhost:5000 as the local development fallback
 // - Avoids duplicate /api prefixes and provides helpful production diagnostics
 const resolveApiBaseUrl = () => {
-  const envUrl = (
+  const isProductionBrowser =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1';
+
+  let envUrl = (
     process.env.REACT_APP_API_URL ||
     process.env.VITE_API_URL ||
     (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_URL : '') ||
     ''
   ).trim();
 
-  const isPlaceholder =
-    !envUrl ||
-    envUrl.includes('your-backend-deployment-url') ||
-    envUrl.includes('your-backend.onrender.com') ||
-    envUrl.includes('<') ||
-    envUrl === 'placeholder';
-
-  const isProductionBrowser =
-    typeof window !== 'undefined' &&
-    window.location.hostname !== 'localhost' &&
-    window.location.hostname !== '127.0.0.1';
-
-  if (isPlaceholder && isProductionBrowser) {
-    console.warn(
-      '[CineVerse AI] Warning: VITE_API_URL is not configured for production. ' +
-        'Please add VITE_API_URL in your Vercel Project Settings -> Environment Variables pointing to your deployed backend (e.g. https://your-backend.onrender.com).'
-    );
+  // If in production browser (e.g. Vercel), ensure we NEVER attempt to connect to localhost:5000
+  if (isProductionBrowser) {
+    if (
+      !envUrl ||
+      envUrl.includes('localhost') ||
+      envUrl.includes('127.0.0.1') ||
+      envUrl.includes('your-backend-deployment-url') ||
+      envUrl.includes('your-backend.onrender.com') ||
+      envUrl.includes('<') ||
+      envUrl === 'placeholder'
+    ) {
+      envUrl = 'https://ticketformovie.onrender.com';
+    }
   }
 
-  const baseUrl = !isPlaceholder ? envUrl.replace(/\/+$/, '') : 'http://localhost:5000';
+  const baseUrl = envUrl ? envUrl.replace(/\/+$/, '') : 'http://localhost:5000';
 
   if (baseUrl.endsWith('/api/v1')) {
     return baseUrl;
